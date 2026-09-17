@@ -10,7 +10,6 @@ async function listOfExpenses() {
             FROM expenses
             JOIN categories ON expenses.category_id = categories.id
             ORDER BY expenses.date DESC
-            LIMIT 3
         `;
 
 	return data;
