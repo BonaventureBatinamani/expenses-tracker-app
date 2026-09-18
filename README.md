@@ -1,36 +1,106 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Expenses Tracker
+
+A personal expenses tracking web app. Users can sign up, record their spending, and get a dashboard overview with summary totals, a per-category breakdown chart, and their most recent transactions.
+
+Built with Next.js (App Router), React, TypeScript, Tailwind CSS, and a PostgreSQL database. Amounts are displayed in Tanzanian Shillings (TZS).
+
+## Features
+
+- **Authentication** — sign up, log in, and log out with email + password (NextAuth Credentials provider, passwords hashed with bcrypt).
+- **Dashboard** — see total / this-month / this-week expenditure, a bar chart of spending by category, and your 5 most recent expenses.
+- **Expense management** — create, edit, and delete expenses, each with an amount, description, and date.
+- **Search & filter** — filter the expense list by text search and by category.
+- **Pagination** — expenses are listed 10 per page.
+- **Empty states** — friendly fallback UI when you have no expenses yet.
+- **Seed data** — a `/seed` route populates the database with sample users, categories, and expenses.
+
+## Tech Stack
+
+- [Next.js 16](https://nextjs.org) (App Router)
+- [React 19](https://react.dev)
+- [TypeScript](https://www.typescriptlang.org)
+- [Tailwind CSS v4](https://tailwindcss.com)
+- [PostgreSQL](https://www.postgresql.org) via the `postgres.js` driver
+- [NextAuth v5](https://next-auth.js.org) (Credentials provider)
+- [Recharts](https://recharts.org) for the category chart
+- [Zod](https://zod.dev) for form validation
+- [bcryptjs](https://github.com/dcodeIO/bcrypt.js) for password hashing
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+- Node.js 20.x or newer
+- pnpm (`npm i -g pnpm`)
+- A PostgreSQL database (local or hosted, e.g. Neon)
+
+### Setup
+
+1. Install dependencies:
+
+   ```bash
+   pnpm install
+   ```
+
+2. Create a `.env` file at the project root with the required variables:
+
+   ```
+   POSTGRES_URL=postgres://user:password@host:5432/database?sslmode=require
+   AUTH_SECRET=<run `openssl rand -base64 32` to generate>
+   ```
+
+3. Seed the database (creates the tables and inserts sample data):
+
+   ```bash
+   curl http://localhost:3000/seed
+   ```
+
+   > Note: `/seed` resets the `expenses` and `categories` tables before re-inserting, so it rebuilds the dataset from scratch each time it runs.
+
+4. Start the development server:
+
+   ```bash
+   pnpm dev
+   ```
+
+5. Open [http://localhost:3000](http://localhost:3000) and sign up, or log in with the seeded demo account:
+   - Email: `expense.account@example.next`
+   - Password: (see `app/lib/placeholder.ts`)
+
+## Scripts
+
+| Script          | Description                     |
+| --------------- | ------------------------------- |
+| `pnpm dev`      | Start the development server    |
+| `pnpm build`    | Build the app for production    |
+| `pnpm start`    | Start the production server     |
+| `pnpm lint`     | Run ESLint                      |
+
+## Project Structure
+
+```
+app/
+  auth.ts, auth.config.ts      # NextAuth setup and route protection
+  lib/
+    db.ts                      # Postgres connection
+    data.ts                    # Data-fetching functions
+    action.ts                  # Server actions (auth, add/edit/delete expense)
+    placeholder.ts             # Seed data
+  seed/route.ts                # Seed endpoint
+  dashboard/                   # Auth-protected dashboard + expense pages
+  login/, sign-up/             # Auth pages
+  ui/                          # UI components (dashboard cards, tables, forms, skeletons)
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Deployment (Vercel)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+1. Push the repository to GitHub.
+2. Import the repo at [vercel.com](https://vercel.com) (pnpm and the `next build` script are auto-detected).
+3. Add the production environment variables in **Project → Settings → Environment Variables**:
+   - `POSTGRES_URL`
+   - `AUTH_SECRET`
+   - `AUTH_TRUST_HOST=true`
+4. Hit `/seed` once on the deployed URL to populate the production database.
+5. Deploy.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Note: `AGENTS.md` and `CLAUDE.md` are auto-generated by the Next.js toolchain on every `next dev` run — they are not hand-edited and should stay in the repository.
