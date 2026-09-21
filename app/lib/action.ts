@@ -47,18 +47,21 @@ const entrySchema = z.object({
         date: z.string()
     })
 
-    const createExpense = entrySchema.omit({id : true, date : true})
-    const EditExpense = entrySchema.omit({id: true, date: true})
+    const createExpense = entrySchema.omit({id : true})
+    const EditExpense = entrySchema.omit({id: true})
 
 export async function addExpense(prevState: AddExpenseState | undefined, formData: FormData){
     const session = await auth()
     if(!session?.user?.id){
         throw new Error ("You must be logged in to view your expenses."); 
     }
+   const date = formData.get("date") || new Date().toISOString().split('T')[0];
+
    const validatedFields = createExpense.safeParse({
         category_id: formData.get('category'),
         description: formData.get('description'),
-        amount: formData.get('amount')
+        amount: formData.get('amount'),
+        date
 
    })
 
@@ -70,12 +73,11 @@ export async function addExpense(prevState: AddExpenseState | undefined, formDat
     }
    }
 
-   const {category_id, description, amount} = validatedFields.data
-   const date =  new Date().toISOString().split('T')[0];
+   const {category_id, description, amount, date: expenseDate} = validatedFields.data
 
    await sql`
         INSERT INTO expenses (user_id, category_id, amount, date, description)
-        VALUES (${session.user.id}, ${category_id}, ${amount}, ${date}, ${description ?? null} )
+        VALUES (${session.user.id}, ${category_id}, ${amount}, ${expenseDate}, ${description ?? null} )
     `
    revalidatePath("/dashboard/expenses");
    redirect("/dashboard/expenses");
@@ -88,17 +90,18 @@ export async function editExpense(id: string, formData: FormData){
         throw new Error ("Unauthorized"); 
     }
 
-    const {category_id, description, amount} = EditExpense.parse({
+    const {category_id, description, amount, date} = EditExpense.parse({
         category_id: formData.get('category'),
         description: formData.get('description'),
-        amount: formData.get('amount')
+        amount: formData.get('amount'),
+        date: formData.get("date") || new Date().toISOString().split('T')[0]
     })
 
      
 
     await sql`
         UPDATE expenses
-        SET category_id = ${category_id}, amount = ${amount}, description = ${description ?? null}
+        SET category_id = ${category_id}, amount = ${amount}, description = ${description ?? null}, date = ${date}
         WHERE id = ${id} AND user_id = ${session.user.id}
     `
 

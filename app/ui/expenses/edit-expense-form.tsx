@@ -81,6 +81,19 @@ export function Form({
           />
         </div>
 
+        <div>
+          <label htmlFor="date" className="block text-sm font-medium text-gray-700">
+            Date
+          </label>
+          <input
+            id="date"
+            type="date"
+            name="date"
+            defaultValue={new Date(expense[0].date).toISOString().split("T")[0]}
+            className={inputClass}
+          />
+        </div>
+
         <div className="mt-1 flex items-center justify-end gap-3">
           <Link
             href="/dashboard/expenses"

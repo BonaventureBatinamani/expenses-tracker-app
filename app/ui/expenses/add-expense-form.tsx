@@ -89,6 +89,27 @@ export default function AddExpensesForm({ categories }: { categories: CategoryFi
           )}
         </div>
 
+        <div>
+          <label htmlFor="date" className="block text-sm font-medium text-gray-700">
+            Date
+          </label>
+          <input
+            id="date"
+            type="date"
+            name="date"
+            aria-describedby="date-error"
+            className={inputClass}
+          />
+          <p id="date-help" className="mt-1.5 text-xs text-gray-400">
+            Optional — defaults to today
+          </p>
+          {state?.errors?.date?.[0] && (
+            <p id="date-error" className="mt-1.5 text-xs font-medium text-red-600">
+              {state.errors.date[0]}
+            </p>
+          )}
+        </div>
+
         <button
           type="submit"
           aria-disabled={isPending}

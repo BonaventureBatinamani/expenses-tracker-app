@@ -20,7 +20,8 @@ export type AddExpenseState = {
     errors?:{
         category_id?: string[];
         description?: string[];
-        amount?: string[]
+        amount?: string[];
+        date?: string[];
     },
 
     message?: string;
